@@ -16,7 +16,7 @@
 - установлен Docker;
 - установлен Kubernetes-кластер;
 - установлен `helm` и `helmfile`;
-- есть запущенный PostgreSQL (url/логин/пароль прописаны в `values.yaml` чарта `muffin-wallet`), для dev можно запустить compose `muffin-wallet/local-env/docker-compose.yamle`;
+- есть запущенный PostgreSQL (url/логин/пароль прописаны в `values.yaml` чарта `muffin-wallet`), для dev можно запустить compose `muffin-wallet/local-env/docker-compose.yaml`;
 - доступен Docker-registry для пуша образов.
 
 ---
@@ -80,7 +80,7 @@ helmfile apply
 helmfile test
 ```
 
-Эта команда выполнит `helm test` для релизов, описанных в `helmfile.yam`l` (см `tests/test-connection.yaml` в каждом чарте).
+Эта команда выполнит `helm test` для релизов, описанных в `helmfile.yam` (см `tests/test-connection.yaml` в каждом чарте).
 
 ## 4. Откат релиза и откат миграций
 
