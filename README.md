@@ -1,4 +1,4 @@
-# Muffin Wallet HW3
+# Muffin Wallet HW4 (Helmfile + Istio)
 
 Проект состоит из:
 
@@ -54,11 +54,23 @@ docker push $REGISTRY/muffin-wallet-migrations:$VERSION
 
 ## 2. Настройка Helm values
 
-Открываем `deploy/muffin-wallet/values.yaml` и указываем репозитории/теги образов и тег БД
+Открываем:
+
+- `deploy/charts/muffin-wallet/values.yaml`
+- `deploy/charts/muffin-currency/values.yaml`
+
+и указываем репозитории/теги образов, параметры БД и Istio-настройки (host для входа снаружи, retry/timeout и т.д.)
+
 
 ## 3. Деплой через Helmfile
 
 Из папки `deploy`:
+
+> **minikube**:
+>
+> ```bash
+> minikube tunnel
+> ```
 
 ```bash
 helmfile apply
@@ -70,7 +82,47 @@ helmfile apply
 
 создаст `Job` с миграциями (`db-migration-job.yaml`), который выполнит `liquibase update`;
 
-поднимет Deployment, Service, Ingress и т.д.
+поднимет Deployment, Service, Istio Gateway/VirtualService и т.д.
+
+---
+
+## 3.1 Istio: sidecar auto-injection, Ingress Gateway, mTLS, AuthZ, Resilience
+
+Что настроено в репозитории:
+
+- namespace `muffin` создаётся Helm-чартом `deploy/charts/muffin-namespace` и получает label `istio-injection=enabled`
+- внешний доступ к `muffin-wallet` — через Istio `Gateway` + `VirtualService` по хосту `wallet.example.com`
+- включён mTLS в namespace `muffin` (`PeerAuthentication` STRICT)
+- доступ к `muffin-currency` ограничен: только из `muffin-wallet` (Istio `AuthorizationPolicy`)
+- устойчивость: `DestinationRule` (circuit breaker/outlier detection) + `VirtualService` (retry/timeout) для `muffin-currency`
+- внешний PostgreSQL описан через Istio `ServiceEntry` (по умолчанию `host.minikube.internal:5432`)
+
+### Внешний IP/доступ по домену
+
+Istio Ingress Gateway выставлен `LoadBalancer` (см. `deploy/istio/gateway-values.yaml`).
+
+- **minikube**: обычно нужен `minikube tunnel`, затем:
+  - взять EXTERNAL-IP у `svc/istio-ingressgateway` в `istio-system`
+  - прописать в `/etc/hosts` строку вида: `<EXTERNAL-IP> wallet.example.com`
+- **kind/другие кластеры**: добейся внешнего IP/NodePort для `istio-ingressgateway` и аналогично пропиши `wallet.example.com`.
+
+---
+
+## 3.2 Observability (Kiali + Prometheus + Tracing)
+
+В `helmfile` добавлены релизы:
+
+- `prometheus` (Prometheus)
+- `kiali` (Kiali)
+- `jaeger` (Jaeger для трассировки)
+
+Быстрый доступ через port-forward (пример):
+
+```bash
+kubectl -n istio-system port-forward svc/kiali 20001:20001
+kubectl -n istio-system port-forward svc/prometheus-server 9090:80
+kubectl -n istio-system port-forward svc/jaeger-query 16686:16686
+```
 
 ### 3.2. Запуск тестов (helm tests)
 
