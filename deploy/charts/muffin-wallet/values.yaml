@@ -7,13 +7,17 @@ image:
 
 containerPort: 8081
 
+serviceAccount:
+  create: true
+  name: muffin-wallet
+
 service:
   type: ClusterIP
   port: 80
   targetPort: 8081
 
 ingress:
-  enabled: true
+  enabled: false
   className: nginx
   hosts:
     - host: muffin-wallet.com
@@ -21,6 +25,31 @@ ingress:
         - path: /
           pathType: Prefix
   tls: []
+
+istio:
+  enabled: true
+  ingress:
+    enabled: true
+    host: wallet.example.com
+    gateway:
+      name: muffin-wallet-gateway
+      selector:
+        istio: ingressgateway
+      port: 80
+  mtls:
+    enabled: true
+  resilience:
+    currency:
+      timeout: 2s
+      retries:
+        attempts: 3
+        perTryTimeout: 1s
+        retryOn: 5xx,connect-failure,refused-stream,reset
+  serviceEntry:
+    postgres:
+      enabled: true
+      host: host.docker.internal
+      port: 5432
 
 env:
   JDK_JAVA_OPTIONS: -Dspring.config.additional-location=/app/config/application.yaml
@@ -30,7 +59,7 @@ applicationConfig:
     port: 8081
   spring:
     datasource:
-      url: jdbc:postgresql://host.minikube.internal:5432/muffin_wallet
+      url: jdbc:postgresql://host.docker.internal:5432/muffin_wallet
       username: muffin-wallet
   currencyService:
     url: http://muffin-currency:8083/rate

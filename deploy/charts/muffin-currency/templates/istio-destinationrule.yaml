@@ -1,0 +1,26 @@
+{{- if and .Values.istio.enabled .Values.istio.mtls.enabled -}}
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ include "muffin-currency.fullname" . }}-dr
+  namespace: {{ .Release.Namespace }}
+spec:
+  host: {{ include "muffin-currency.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+    {{- if .Values.istio.circuitBreaker.enabled }}
+    connectionPool:
+      tcp:
+        maxConnections: {{ .Values.istio.circuitBreaker.connectionPool.tcp.maxConnections }}
+      http:
+        http1MaxPendingRequests: {{ .Values.istio.circuitBreaker.connectionPool.http.http1MaxPendingRequests }}
+        maxRequestsPerConnection: {{ .Values.istio.circuitBreaker.connectionPool.http.maxRequestsPerConnection }}
+    outlierDetection:
+      consecutive5xxErrors: {{ .Values.istio.circuitBreaker.outlierDetection.consecutive5xxErrors }}
+      interval: {{ .Values.istio.circuitBreaker.outlierDetection.interval }}
+      baseEjectionTime: {{ .Values.istio.circuitBreaker.outlierDetection.baseEjectionTime }}
+      maxEjectionPercent: {{ .Values.istio.circuitBreaker.outlierDetection.maxEjectionPercent }}
+    {{- end }}
+{{- end }}
+

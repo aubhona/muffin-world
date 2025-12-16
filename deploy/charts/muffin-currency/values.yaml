@@ -5,12 +5,37 @@ image:
   tag: "1.0.0"
   pullPolicy: IfNotPresent
 
+serviceAccount:
+  create: true
+  name: muffin-currency
+
 service:
   type: ClusterIP
   port: 8083
   targetPort: 8080
 
 containerPort: 8080
+
+istio:
+  enabled: true
+  mtls:
+    enabled: true
+  authz:
+    enabled: true
+    allowFromServiceAccount: muffin-wallet
+  circuitBreaker:
+    enabled: true
+    connectionPool:
+      tcp:
+        maxConnections: 50
+      http:
+        http1MaxPendingRequests: 100
+        maxRequestsPerConnection: 100
+    outlierDetection:
+      consecutive5xxErrors: 3
+      interval: 5s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
 
 probes:
   liveness:

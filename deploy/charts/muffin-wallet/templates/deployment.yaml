@@ -11,9 +11,14 @@ spec:
 {{ include "muffin-wallet.selectorLabels" . | indent 6 }}
   template:
     metadata:
+      annotations:
+        {{- if .Values.istio.enabled }}
+        sidecar.istio.io/rewriteAppHTTPProbers: "true"
+        {{- end }}
       labels:
 {{ include "muffin-wallet.selectorLabels" . | indent 8 }}
     spec:
+      serviceAccountName: {{ include "muffin-wallet.serviceAccountName" . }}
       volumes:
         - name: application-config-volume
           configMap:

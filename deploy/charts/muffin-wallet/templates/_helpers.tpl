@@ -23,3 +23,11 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- define "muffin-wallet.envConfigMapName" -}}
 {{ include "muffin-wallet.fullname" . }}-env
 {{- end }}
+
+{{- define "muffin-wallet.serviceAccountName" -}}
+{{- if .Values.serviceAccount.name -}}
+{{ .Values.serviceAccount.name }}
+{{- else -}}
+{{ include "muffin-wallet.fullname" . }}
+{{- end -}}
+{{- end }}

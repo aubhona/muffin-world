@@ -1,12 +1,90 @@
+helmDefaults:
+  wait: true
+  timeout: 1800
+  diffArgs:
+    - --disable-validation
+
+repositories:
+  - name: istio
+    url: https://istio-release.storage.googleapis.com/charts
+  - name: kiali
+    url: https://kiali.org/helm-charts
+  - name: prometheus-community
+    url: https://prometheus-community.github.io/helm-charts
+  - name: jaegertracing
+    url: https://jaegertracing.github.io/helm-charts
+
 releases:
-  - name: muffin-currency
+  # ---- Istio ----
+  - name: istio-base
+    namespace: istio-system
+    chart: istio/base
+    createNamespace: true
+
+  - name: istiod
+    namespace: istio-system
+    chart: istio/istiod
+    needs:
+      - istio-system/istio-base
+    values:
+      - ./istio/istiod-values.yaml
+
+  - name: istio-ingressgateway
+    namespace: istio-system
+    chart: istio/gateway
+    needs:
+      - istio-system/istiod
+    values:
+      - ./istio/gateway-values.yaml
+
+  # ---- Observability ----
+  - name: prometheus
+    namespace: istio-system
+    chart: prometheus-community/prometheus
+    needs:
+      - istio-system/istiod
+    values:
+      - ./istio/prometheus-values.yaml
+
+  - name: jaeger
+    namespace: istio-system
+    chart: jaegertracing/jaeger
+    needs:
+      - istio-system/istiod
+    values:
+      - ./istio/jaeger-values.yaml
+
+  - name: kiali
+    namespace: istio-system
+    chart: kiali/kiali-server
+    needs:
+      - istio-system/prometheus
+    values:
+      - ./istio/kiali-values.yaml
+
+  # ---- App namespace (istio sidecar auto-injection) ----
+  - name: muffin-namespace
     namespace: default
+    chart: ./charts/muffin-namespace
+    values:
+      - ./charts/muffin-namespace/values.yaml
+
+  # ---- Apps ----
+  - name: muffin-currency
+    namespace: muffin
     chart: ./charts/muffin-currency
+    needs:
+      - default/muffin-namespace
+      - istio-system/istiod
     values:
       - ./charts/muffin-currency/values.yaml
 
   - name: muffin-wallet
-    namespace: default
+    namespace: muffin
     chart: ./charts/muffin-wallet
+    needs:
+      - default/muffin-namespace
+      - istio-system/istiod
+      - muffin/muffin-currency
     values:
       - ./charts/muffin-wallet/values.yaml

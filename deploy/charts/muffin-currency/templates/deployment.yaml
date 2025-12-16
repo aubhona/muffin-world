@@ -11,9 +11,14 @@ spec:
             app: {{ include "muffin-currency.name" . }}
     template:
         metadata:
+            annotations:
+                {{- if .Values.istio.enabled }}
+                sidecar.istio.io/rewriteAppHTTPProbers: "true"
+                {{- end }}
             labels:
                 app: {{ include "muffin-currency.name" . }}
         spec:
+            serviceAccountName: {{ include "muffin-currency.serviceAccountName" . }}
             containers:
                 - name: {{ include "muffin-currency.name" . }}
                   image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"

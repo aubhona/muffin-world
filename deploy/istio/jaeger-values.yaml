@@ -1,0 +1,20 @@
+provisionDataStore:
+  cassandra: false
+
+storage:
+  type: memory
+
+agent:
+  enabled: false
+
+collector:
+  service:
+    zipkin:
+      port: 9411
+
+query:
+  enabled: true
+
+allInOne:
+  enabled: true
+

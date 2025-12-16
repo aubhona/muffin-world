@@ -1,0 +1,13 @@
+{{- if and .Values.istio.enabled .Values.istio.mtls.enabled -}}
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ include "muffin-wallet.fullname" . }}-dr
+  namespace: {{ .Release.Namespace }}
+spec:
+  host: {{ include "muffin-wallet.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+{{- end }}
+

@@ -1,0 +1,11 @@
+auth:
+  strategy: anonymous
+
+external_services:
+  prometheus:
+    url: http://prometheus-server.istio-system.svc.cluster.local
+  tracing:
+    enabled: true
+    provider: jaeger
+    url: http://jaeger-query.istio-system.svc.cluster.local:16686
+

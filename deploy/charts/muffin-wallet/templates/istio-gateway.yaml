@@ -1,0 +1,18 @@
+{{- if and .Values.istio.enabled .Values.istio.ingress.enabled -}}
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: {{ .Values.istio.ingress.gateway.name | default (printf "%s-gateway" (include "muffin-wallet.fullname" .)) }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+{{- toYaml .Values.istio.ingress.gateway.selector | nindent 4 }}
+  servers:
+    - port:
+        number: {{ .Values.istio.ingress.gateway.port | default 80 }}
+        name: http
+        protocol: HTTP
+      hosts:
+        - {{ .Values.istio.ingress.host | quote }}
+{{- end }}
+

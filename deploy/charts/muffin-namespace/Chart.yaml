@@ -1,0 +1,6 @@
+apiVersion: v2
+name: muffin-namespace
+description: Namespace for Muffin services with Istio sidecar auto-injection enabled
+type: application
+version: 0.1.0
+

@@ -1,0 +1,17 @@
+{{- if and .Values.istio.enabled .Values.istio.serviceEntry.postgres.enabled -}}
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: postgres-external
+  namespace: {{ .Release.Namespace }}
+spec:
+  hosts:
+    - {{ .Values.istio.serviceEntry.postgres.host | quote }}
+  ports:
+    - number: {{ .Values.istio.serviceEntry.postgres.port }}
+      name: tcp-postgres
+      protocol: TCP
+  location: MESH_EXTERNAL
+  resolution: DNS
+{{- end }}
+

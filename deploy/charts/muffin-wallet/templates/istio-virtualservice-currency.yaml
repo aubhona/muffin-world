@@ -1,0 +1,23 @@
+{{- if and .Values.istio.enabled .Values.istio.resilience.currency -}}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: muffin-currency-client
+  namespace: {{ .Release.Namespace }}
+spec:
+  hosts:
+    - muffin-currency
+    - muffin-currency.{{ .Release.Namespace }}.svc.cluster.local
+  http:
+    - timeout: {{ .Values.istio.resilience.currency.timeout }}
+      retries:
+        attempts: {{ .Values.istio.resilience.currency.retries.attempts }}
+        perTryTimeout: {{ .Values.istio.resilience.currency.retries.perTryTimeout }}
+        retryOn: {{ .Values.istio.resilience.currency.retries.retryOn | quote }}
+      route:
+        - destination:
+            host: muffin-currency.{{ .Release.Namespace }}.svc.cluster.local
+            port:
+              number: 8083
+{{- end }}
+

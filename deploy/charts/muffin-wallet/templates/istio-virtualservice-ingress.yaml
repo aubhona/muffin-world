@@ -1,0 +1,22 @@
+{{- if and .Values.istio.enabled .Values.istio.ingress.enabled -}}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ include "muffin-wallet.fullname" . }}-ingress
+  namespace: {{ .Release.Namespace }}
+spec:
+  hosts:
+    - {{ .Values.istio.ingress.host | quote }}
+  gateways:
+    - {{ .Values.istio.ingress.gateway.name | default (printf "%s-gateway" (include "muffin-wallet.fullname" .)) }}
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: {{ include "muffin-wallet.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+            port:
+              number: {{ .Values.service.port }}
+{{- end }}
+
