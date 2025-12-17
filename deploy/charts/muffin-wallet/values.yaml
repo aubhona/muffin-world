@@ -62,7 +62,7 @@ applicationConfig:
       url: jdbc:postgresql://host.docker.internal:5432/muffin_wallet
       username: muffin-wallet
   currencyService:
-    url: http://muffin-currency:8083/rate
+    url: http://muffin-currency:8083/rate?from=PLAIN&to=CHOKOLATE
 
 secret:
   SPRING_DATASOURCE_PASSWORD: muffin-wallet

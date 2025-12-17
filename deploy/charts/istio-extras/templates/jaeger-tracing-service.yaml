@@ -1,0 +1,22 @@
+{{- if .Values.jaeger.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: tracing
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: tracing
+spec:
+  selector:
+{{- toYaml .Values.jaeger.selector | nindent 4 }}
+  ports:
+    - name: http-query
+      port: 80
+      targetPort: 16686
+      protocol: TCP
+    - name: grpc-query
+      port: 16685
+      targetPort: 16685
+      protocol: TCP
+{{- end -}}
+

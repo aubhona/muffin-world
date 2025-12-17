@@ -9,3 +9,7 @@ external_services:
     provider: jaeger
     url: http://jaeger-query.istio-system.svc.cluster.local:16686
 
+deployment:
+  network_policy:
+    enabled: false
+

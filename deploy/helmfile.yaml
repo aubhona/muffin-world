@@ -54,6 +54,14 @@ releases:
     values:
       - ./istio/jaeger-values.yaml
 
+  - name: istio-extras
+    namespace: istio-system
+    chart: ./charts/istio-extras
+    needs:
+      - istio-system/jaeger
+    values:
+      - ./charts/istio-extras/values.yaml
+
   - name: kiali
     namespace: istio-system
     chart: kiali/kiali-server
