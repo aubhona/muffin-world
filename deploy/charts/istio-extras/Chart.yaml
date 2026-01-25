@@ -3,4 +3,3 @@ name: istio-extras
 description: Extra Istio-related resources (e.g., compatibility Services for addons)
 type: application
 version: 0.1.0
-

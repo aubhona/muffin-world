@@ -4,4 +4,3 @@ jaeger:
     app.kubernetes.io/instance: jaeger
     app.kubernetes.io/name: jaeger
     app.kubernetes.io/component: all-in-one
-

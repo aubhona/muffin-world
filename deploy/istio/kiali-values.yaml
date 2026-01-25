@@ -12,4 +12,3 @@ external_services:
 deployment:
   network_policy:
     enabled: false
-

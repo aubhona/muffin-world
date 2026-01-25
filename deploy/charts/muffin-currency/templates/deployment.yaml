@@ -13,6 +13,7 @@ spec:
         metadata:
             annotations:
                 {{- if .Values.istio.enabled }}
+                sidecar.istio.io/inject: "true"
                 sidecar.istio.io/rewriteAppHTTPProbers: "true"
                 {{- end }}
             labels:

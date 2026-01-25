@@ -15,7 +15,6 @@ repositories:
     url: https://jaegertracing.github.io/helm-charts
 
 releases:
-  # ---- Istio ----
   - name: istio-base
     namespace: istio-system
     chart: istio/base
@@ -37,7 +36,6 @@ releases:
     values:
       - ./istio/gateway-values.yaml
 
-  # ---- Observability ----
   - name: prometheus
     namespace: istio-system
     chart: prometheus-community/prometheus
@@ -70,14 +68,12 @@ releases:
     values:
       - ./istio/kiali-values.yaml
 
-  # ---- App namespace (istio sidecar auto-injection) ----
   - name: muffin-namespace
     namespace: default
     chart: ./charts/muffin-namespace
     values:
       - ./charts/muffin-namespace/values.yaml
 
-  # ---- Apps ----
   - name: muffin-currency
     namespace: muffin
     chart: ./charts/muffin-currency

@@ -19,4 +19,3 @@ spec:
       targetPort: 16685
       protocol: TCP
 {{- end -}}
-
